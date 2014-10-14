@@ -5,8 +5,8 @@
 GameController::GameController(void)
 {
 	tablero=new CTablero();
-	jugador=new CJugador(7,7);
-	enemigos.push_back(new CEnemigo(11,1));
+	jugador=new CJugador(7,11);
+	enemigos.push_back(new CEnemigo(11,3));
 	enemigos.push_back(new CEnemigo(1,13));
 	enemigos.push_back(new CEnemigo(3,8));
 	enemigos.push_back(new CEnemigo(11,11));
