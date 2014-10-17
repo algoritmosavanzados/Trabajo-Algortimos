@@ -49,6 +49,7 @@ namespace Algoritmomovimientoenemigos {
 	private: System::Windows::Forms::Panel^  panel1;
 	private: System::Windows::Forms::Timer^  timer1;
 	private: System::Windows::Forms::Button^  button1;
+
 	private: System::ComponentModel::IContainer^  components;
 	protected: 
 
@@ -73,19 +74,20 @@ namespace Algoritmomovimientoenemigos {
 			// 
 			// panel1
 			// 
-			this->panel1->Location = System::Drawing::Point(168, 38);
+			this->panel1->Location = System::Drawing::Point(25, 62);
 			this->panel1->Name = L"panel1";
-			this->panel1->Size = System::Drawing::Size(355, 324);
+			this->panel1->Size = System::Drawing::Size(620, 500);
 			this->panel1->TabIndex = 0;
 			// 
 			// timer1
 			// 
 			this->timer1->Enabled = true;
+			this->timer1->Interval = 25;
 			this->timer1->Tick += gcnew System::EventHandler(this, &Form1::timer1_Tick);
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(25, 38);
+			this->button1->Location = System::Drawing::Point(25, 12);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(100, 23);
 			this->button1->TabIndex = 1;
@@ -97,12 +99,14 @@ namespace Algoritmomovimientoenemigos {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(670, 389);
+			this->ClientSize = System::Drawing::Size(670, 590);
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->panel1);
+			this->KeyPreview = true;
 			this->Name = L"Form1";
 			this->Text = L"Form1";
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
+			this->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &Form1::Form1_KeyPress);
 			this->ResumeLayout(false);
 
 		}
@@ -123,6 +127,7 @@ namespace Algoritmomovimientoenemigos {
 
 			
 				controlador->ImprimeJuego(buffer->Graphics,gWidth,gHeight);
+				controlador->MueveEnemigos();
 			
 				buffer->Render(g);
 				delete g;
@@ -136,6 +141,27 @@ namespace Algoritmomovimientoenemigos {
 private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
 			 controlador->HallarCaminos();
 		 }
+private: System::Void Form1_KeyPress(System::Object^  sender, System::Windows::Forms::KeyPressEventArgs^  e) { 
+			char c = e->KeyChar;
+			if(!controlador->JugadorEstaMoviendose()){
+				if (c == 'a' || c == 'A'){
+					controlador->MoverJugador(IZQUIERDA);
+				}else if(c == 'd' || c == 'D'){
+					controlador->MoverJugador(DERECHA);
+				}else if(c == 'w' || c == 'W'){
+					controlador->MoverJugador(ARRIBA);
+				}else if(c == 's' || c == 'S'){
+					controlador->MoverJugador(ABAJO);
+				}else if(c == 'v'){
+					controlador->Añade_bala(panel1->Width,panel1->Height,20); // este 20 es el maximo numero de balas q puedo disparar 
+				}
+			}
+			
+		 }
+
+private: System::Void timer2_Tick(System::Object^  sender, System::EventArgs^  e) {
+		 }
+
 };
 }
 

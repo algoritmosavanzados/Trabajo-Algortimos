@@ -62,3 +62,7 @@ bool CTablero::esNormal(int f,int c){
 void CTablero::cambiarBloque(int f,int c,Casilla tipo){
 	tablero[f][c]=tipo;
 }
+
+Casilla CTablero::getTipoCasilla(int f,int c){
+	return (Casilla) tablero[f][c];
+}

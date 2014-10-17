@@ -6,6 +6,9 @@ CPersonaje::CPersonaje(int f,int c)
 {
 	this->f=f;
 	this->c=c;
+	w=h=64;
+	col=0;
+	moviendose=false;
 }
 
 
@@ -22,43 +25,139 @@ bool CPersonaje::casillaIsValid(CTablero* tablero,int f,int c){
 //--------------------------------------
 
 CJugador::CJugador(int f,int c) : CPersonaje(f,c){
+	dir=ABAJO;
+	fil=11;
 }
 
-void CJugador::MueveteEnDireccion(Direccion dir,CTablero* tablero){
+void Muevete(){
+}
+
+bool CJugador::MueveteHacia(Direccion dir,CTablero* tablero){
 	int i=f,j=c;
 	switch(dir){
-		case IZQUIERDA:	c--;	break;
-		case DERECHA:	c++;	break;
-		case ARRIBA:	f--;	break;
-		case ABAJO:		f++;	break;
+		case IZQUIERDA:	j--;	break;
+		case DERECHA:	j++;	break;
+		case ARRIBA:	i--;	break;
+		case ABAJO:		i++;	break;
 	}
-	if(casillaIsValid(tablero,i,f)){
-		f=i;	c=i;
-	}
+	if(casillaIsValid(tablero,i,j)){
+		moviendose=true;
+		switch(dir){
+			case IZQUIERDA:	fil=9;	break;
+			case DERECHA:	fil=11;	break;
+			case ARRIBA:	fil=8;	break;
+			case ABAJO:		fil=10;	break;
+		}
+		this->dir=dir;
+		return true;
+	}else
+		return false;
+
 }
 
 void CJugador::Imprimete(System::Drawing::Graphics ^C,CTablero* tablero,int ancho,int alto){
 	int anchoElipse=ancho/tablero->c;
 	int altoElipse=alto/tablero->f;
 	int y=f * altoElipse;
-	int x=anchoElipse * c;
-	System::Drawing::SolidBrush ^b = gcnew System::Drawing::SolidBrush(System::Drawing::Color::Green);
-	C->FillEllipse(b,x,y,anchoElipse,altoElipse);
+	int x=anchoElipse * this->c;
+	/*System::Drawing::SolidBrush ^b = gcnew System::Drawing::SolidBrush(System::Drawing::Color::Green);
+	C->FillEllipse(b,x,y,anchoElipse,altoElipse);*/
+	int dx=0,dy=0;
+	if(moviendose && MueveteHacia(dir,tablero)){
+		col++;
+		switch(dir){
+			case IZQUIERDA:	dx-=col*anchoElipse/3;		break;
+			case DERECHA:	dx+=col*anchoElipse/3;		break;
+			case ARRIBA:	dy-=col*altoElipse/3;		break;
+			case ABAJO:		dy+=col*altoElipse/3;		break;
+		}
+		if(col>=3){
+			col=0;	moviendose=false;
+			switch(dir){
+				case IZQUIERDA:	this->c--;	break;
+				case DERECHA:	this->c++;	break;
+				case ARRIBA:	f--;	break;
+				case ABAJO:		f++;	break;
+			}
+		}
+	}
+
+	System::Drawing::Rectangle porcion=System::Drawing::Rectangle(col*w,fil*h,w,h);
+	System::Drawing::Bitmap ^bmp=gcnew System::Drawing::Bitmap("sprite_personaje.png");
+
+	System::Drawing::Rectangle zonaMostrar= System::Drawing::Rectangle(x+dx,y+dy,anchoElipse,altoElipse);
+	C->DrawImage(bmp,zonaMostrar,porcion,System::Drawing::GraphicsUnit::Pixel);
+
+	//C->DrawImage(bmp,x+dx,y+dy,porcion,System::Drawing::GraphicsUnit::Pixel);
+	delete bmp;
+	
 }
 
 //-----------------------------------------
 
 CEnemigo::CEnemigo(int f,int c) : CPersonaje(f,c){
+	moviendose=false;
+	fil=11;
+	dir=ABAJO;
 }
 
 void CEnemigo::Imprimete(System::Drawing::Graphics ^C,CTablero* tablero,int ancho,int alto){
 	int anchoElipse=ancho/tablero->c;
 	int altoElipse=alto/tablero->f;
 	int y=f * altoElipse;
-	int x=anchoElipse * c;
-	System::Drawing::SolidBrush ^b = gcnew System::Drawing::SolidBrush(System::Drawing::Color::Red);
-	C->FillEllipse(b,x,y,anchoElipse,altoElipse);
+	int x=anchoElipse * this->c;
+	/*System::Drawing::SolidBrush ^b = gcnew System::Drawing::SolidBrush(System::Drawing::Color::Green);
+	C->FillEllipse(b,x,y,anchoElipse,altoElipse);*/
+	int dx=0,dy=0;
+	if(moviendose){
+		col++;
+		switch(dir){
+			case IZQUIERDA:	dx-=col*anchoElipse/9;		break;
+			case DERECHA:	dx+=col*anchoElipse/9;		break;
+			case ARRIBA:	dy-=col*altoElipse/9;		break;
+			case ABAJO:		dy+=col*altoElipse/9;		break;
+		}
+		if(col>=9){
+			col=0;	moviendose=false;
+			switch(dir){
+				case IZQUIERDA:	this->c--;	break;
+				case DERECHA:	this->c++;	break;
+				case ARRIBA:	f--;	break;
+				case ABAJO:		f++;	break;
+			}
+		}
+	}
+
+	System::Drawing::Rectangle porcion=System::Drawing::Rectangle(col*w,fil*h,w,h);
+	System::Drawing::Bitmap ^bmp=gcnew System::Drawing::Bitmap("enemigo.png");
+
+	System::Drawing::Rectangle zonaMostrar= System::Drawing::Rectangle(x+dx,y+dy,anchoElipse,altoElipse);
+	C->DrawImage(bmp,zonaMostrar,porcion,System::Drawing::GraphicsUnit::Pixel);
 }
+
+
+//void CEnemigo::hallaMejorCamino(CTablero* tablero,int fObjetivo,int cObjetivo){
+//	vector<vector<int>> distancias;
+//	distancias.resize(tablero->f);
+//	for(int i=0;i<distancias.size();i++)
+//		distancias[i].resize(tablero->c,-1);
+//	distancias[f][c]=0;
+//	bool cond=true;
+//	queue<pair<int,int>> pendientes;
+//	BFS(tablero,distancias,f,c,make_pair(fObjetivo,cObjetivo),cond,pendientes);
+//	stack<pair<int,int>> recorrido;
+//	armaRecorrido(recorrido,distancias,fObjetivo,cObjetivo);
+//	dir=recorrido.top();
+//
+//	switch(dir){
+//			case IZQUIERDA:	fil=9;	break;
+//			case DERECHA:	fil=11;	break;
+//			case ARRIBA:	fil=8;	break;
+//			case ABAJO:		fil=10;	break;
+//		}
+//
+//	moviendose=true;
+//}
 
 
 stack<pair<int,int>> CEnemigo::hallaMejorCamino(CTablero* tablero,int fObjetivo,int cObjetivo){
@@ -83,8 +182,31 @@ stack<pair<int,int>> CEnemigo::hallaMejorCamino(CTablero* tablero,int fObjetivo,
 	BFS(tablero,distancias,f,c,make_pair(fObjetivo,cObjetivo),cond,pendientes);
 	stack<pair<int,int>> recorrido;
 	armaRecorrido(recorrido,distancias,fObjetivo,cObjetivo);
+
+	recorrido.pop();
+			pair<int,int> coord=recorrido.top();
+			int f=coord.first,c=coord.second;
+			vector<pair<int,int>> posibilidades;
+			posibilidades.push_back(make_pair(f,c+1)); // DERECHA
+			posibilidades.push_back(make_pair(f,c-1)); // IZQUIERDA
+			posibilidades.push_back(make_pair(f+1,c)); // ABAJO
+			posibilidades.push_back(make_pair(f-1,c)); // ARRIBA
+			
+
+			for(int j=0;j<posibilidades.size();j++){
+				pair<int,int> coord=posibilidades[j];
+				int fCaso=coord.first;
+				int cCaso=coord.second;
+				if(fCaso==this->f && cCaso==this->c){
+					this->dir=(Direccion)j;
+					this->moviendose=true;
+				}
+			}
+
 	return recorrido;
 }
+
+
 
 void CEnemigo::DFS(CTablero* tablero,vector<vector<bool>> explorados,int f,int c,int fObjetivo,int cObjetivo,
 	int &menor, stack<pair<int,int>> recorrido,stack<pair<int,int>> &solucion){
@@ -119,16 +241,14 @@ void CEnemigo::DFS(CTablero* tablero,vector<vector<bool>> explorados,int f,int c
 
 
 void CEnemigo::BFS(CTablero* tablero,vector<vector<int>> &explorados,int fila,int col,pair<int,int> objetivo,bool &cond,queue<pair<int,int>> &pendientes){
-	vector<pair<int,int>> posibilidades;
 	
-
 	int c=col,fObjetivo=objetivo.first,cObjetivo=objetivo.second;
 	if(fila==fObjetivo && c==cObjetivo){
 		cond=false;
 		return;
 	}
 
-
+	vector<pair<int,int>> posibilidades;
 	posibilidades.push_back(make_pair(fila-1,c)); // IZQUIERDA
 	posibilidades.push_back(make_pair(fila,c-1)); // ARRIBA
 	posibilidades.push_back(make_pair(fila+1,c)); // DERECHA
@@ -151,6 +271,35 @@ void CEnemigo::BFS(CTablero* tablero,vector<vector<int>> &explorados,int fila,in
 	}
 }
 
+//void CEnemigo::armaRecorrido(stack<Direccion> &recorrido,vector<vector<int>>distancias,int f,int c){
+//
+//	if(distancias[f][c]==0)	return;
+//
+//	vector<pair<int,int>> posibilidades;
+//	posibilidades.push_back(make_pair(f,c-1)); // IZQUIERDA
+//	posibilidades.push_back(make_pair(f-1,c)); // ARRIBA
+//	posibilidades.push_back(make_pair(f,c+1)); // DERECHA
+//	posibilidades.push_back(make_pair(f+1,c)); // ABAJO
+//
+//	for(int i=0;i<posibilidades.size();i++){
+//		pair<int,int> coord=posibilidades[i];
+//		int fCaso=coord.first;
+//		int cCaso=coord.second;
+//		if(distancias[fCaso][cCaso]==distancias[f][c]-1){
+//			switch(i){
+//				case IZQUIERDA:	recorrido.push(DERECHA);	break;
+//				case DERECHA:	recorrido.push(IZQUIERDA);	break;
+//				case ARRIBA:	recorrido.push(ABAJO);		break;
+//				case ABAJO:		recorrido.push(ARRIBA);		break;
+//			}
+//			//recorrido.push((Direccion)i);
+//			armaRecorrido(recorrido,distancias,fCaso,cCaso);
+//			break;
+//		}
+//	}
+//}
+//
+
 void CEnemigo::armaRecorrido(stack<pair<int,int>> &recorrido,vector<vector<int>>distancias,int f,int c){
 	recorrido.push(make_pair(f,c));
 
@@ -172,3 +321,48 @@ void CEnemigo::armaRecorrido(stack<pair<int,int>> &recorrido,vector<vector<int>>
 		}
 	}
 }
+
+
+void CEnemigo::avanza(CTablero* tablero,int fO,int cO){
+	if(camino.empty())
+		hallaMejorCamino(tablero,fO,cO);
+
+	if(!moviendose){
+		dir=camino.front();
+		camino.pop_back();
+		moviendose=true;
+	}
+}
+
+//--------------------------------------
+
+CBala::CBala(int f, int c, int ancho, int alto,Direccion direccion ) : CPersonaje(f, c){
+	 direc = direccion;
+}
+
+void CBala::Imprimete(System::Drawing::Graphics ^C, CTablero* tablero, int ancho, int alto){
+	
+	int anchoElipse = ancho / tablero->c;
+	int altoElipse = alto / tablero->f;
+	int y = f * (alto / tablero->f);
+	int x = (ancho / tablero->c) * c;
+	
+	System::Drawing::SolidBrush ^b = gcnew System::Drawing::SolidBrush(System::Drawing::Color::Blue);
+	C->FillEllipse(b, x, y, anchoElipse, altoElipse);
+}
+bool CBala::muevete(CTablero* tablero, int ancho, int alto){
+	int i = f, j = c;
+	switch (direc){
+		case IZQUIERDA:	j--;	break;
+		case DERECHA:	j++;	break;
+		case ARRIBA:	i--;	break;
+		case ABAJO:		i++;	break;
+	}
+	if (casillaIsValid(tablero, i, j)){
+		f = i;	c = j;
+	}
+	return true;
+
+}
+
+//-----

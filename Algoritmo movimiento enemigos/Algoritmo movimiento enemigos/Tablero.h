@@ -18,6 +18,7 @@ public:
 	~CTablero(void);
 	void Imprimete(System::Drawing::Graphics ^c,int ancho,int alto);
 	bool esNormal(int f,int c);
+	Casilla getTipoCasilla(int f,int c);
 	void cambiarBloque(int f,int c,Casilla tipo);
 
 };
