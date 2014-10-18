@@ -33,6 +33,19 @@ void Muevete(){
 }
 
 bool CJugador::MueveteHacia(Direccion dir,CTablero* tablero){
+	if(this->dir!=dir){
+		this->dir=dir;
+		switch(dir){
+			case IZQUIERDA:	fil=9;	break;
+			case DERECHA:	fil=11;	break;
+			case ARRIBA:	fil=8;	break;
+			case ABAJO:		fil=10;	break;
+		}
+		return false;
+	}
+
+
+
 	int i=f,j=c;
 	switch(dir){
 		case IZQUIERDA:	j--;	break;
@@ -40,8 +53,10 @@ bool CJugador::MueveteHacia(Direccion dir,CTablero* tablero){
 		case ARRIBA:	i--;	break;
 		case ABAJO:		i++;	break;
 	}
+
+
 	if(casillaIsValid(tablero,i,j)){
-		moviendose=true;
+			moviendose=true;
 		switch(dir){
 			case IZQUIERDA:	fil=9;	break;
 			case DERECHA:	fil=11;	break;
@@ -50,8 +65,10 @@ bool CJugador::MueveteHacia(Direccion dir,CTablero* tablero){
 		}
 		this->dir=dir;
 		return true;
-	}else
+	}else{
+		this->dir=dir;
 		return false;
+	}
 
 }
 
@@ -112,12 +129,12 @@ void CEnemigo::Imprimete(System::Drawing::Graphics ^C,CTablero* tablero,int anch
 	if(moviendose){
 		col++;
 		switch(dir){
-			case IZQUIERDA:	dx-=col*anchoElipse/9;		break;
-			case DERECHA:	dx+=col*anchoElipse/9;		break;
-			case ARRIBA:	dy-=col*altoElipse/9;		break;
-			case ABAJO:		dy+=col*altoElipse/9;		break;
+			case IZQUIERDA:	dx-=col*anchoElipse/6;		break;
+			case DERECHA:	dx+=col*anchoElipse/6;		break;
+			case ARRIBA:	dy-=col*altoElipse/6;		break;
+			case ABAJO:		dy+=col*altoElipse/6;		break;
 		}
-		if(col>=9){
+		if(col>=6){
 			col=0;	moviendose=false;
 			switch(dir){
 				case IZQUIERDA:	this->c--;	break;
@@ -133,6 +150,8 @@ void CEnemigo::Imprimete(System::Drawing::Graphics ^C,CTablero* tablero,int anch
 
 	System::Drawing::Rectangle zonaMostrar= System::Drawing::Rectangle(x+dx,y+dy,anchoElipse,altoElipse);
 	C->DrawImage(bmp,zonaMostrar,porcion,System::Drawing::GraphicsUnit::Pixel);
+
+	delete bmp;
 }
 
 
@@ -184,6 +203,7 @@ stack<pair<int,int>> CEnemigo::hallaMejorCamino(CTablero* tablero,int fObjetivo,
 	armaRecorrido(recorrido,distancias,fObjetivo,cObjetivo);
 
 	recorrido.pop();
+	if(!recorrido.empty()){
 			pair<int,int> coord=recorrido.top();
 			int f=coord.first,c=coord.second;
 			vector<pair<int,int>> posibilidades;
@@ -200,8 +220,17 @@ stack<pair<int,int>> CEnemigo::hallaMejorCamino(CTablero* tablero,int fObjetivo,
 				if(fCaso==this->f && cCaso==this->c){
 					this->dir=(Direccion)j;
 					this->moviendose=true;
+					
+				switch(dir){
+						case IZQUIERDA:	fil=9;	break;
+						case DERECHA:	fil=11;	break;
+						case ARRIBA:	fil=8;	break;
+						case ABAJO:		fil=10;	break;
+					}
+
 				}
 			}
+	}
 
 	return recorrido;
 }
@@ -334,6 +363,15 @@ void CEnemigo::avanza(CTablero* tablero,int fO,int cO){
 	}
 }
 
+bool CEnemigo::colision(CJugador* jugador){
+	
+	if ((jugador->f == f) && (jugador->c == c)){
+		f = -1; c == -1;
+		return true;
+	}
+	return false;
+}
+
 //--------------------------------------
 
 CBala::CBala(int f, int c, int ancho, int alto,Direccion direccion ) : CPersonaje(f, c){
@@ -348,9 +386,9 @@ void CBala::Imprimete(System::Drawing::Graphics ^C, CTablero* tablero, int ancho
 	int x = (ancho / tablero->c) * c;
 	
 	System::Drawing::SolidBrush ^b = gcnew System::Drawing::SolidBrush(System::Drawing::Color::Blue);
-	C->FillEllipse(b, x, y, anchoElipse, altoElipse);
+	C->FillEllipse(b, x + anchoElipse / 3, y + altoElipse / 3, anchoElipse / 3, altoElipse / 3);
 }
-bool CBala::muevete(CTablero* tablero, int ancho, int alto){
+bool CBala::muevete(CTablero* tablero){
 	int i = f, j = c;
 	switch (direc){
 		case IZQUIERDA:	j--;	break;
@@ -361,8 +399,16 @@ bool CBala::muevete(CTablero* tablero, int ancho, int alto){
 	if (casillaIsValid(tablero, i, j)){
 		f = i;	c = j;
 	}
+	else{ f = -1; c = -1;  }
 	return true;
 
 }
 
+bool CBala::Colision(CEnemigo *enemigo){
+	if ((enemigo->f == f) && (enemigo->c == c)){
+		f = -1; c == -1;
+		return true;
+	}
+	return false;
+}
 //-----

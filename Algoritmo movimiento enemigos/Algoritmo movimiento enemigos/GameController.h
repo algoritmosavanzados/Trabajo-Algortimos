@@ -10,6 +10,9 @@ private:
 	vector<CEnemigo*> enemigos;
 	CTablero* tablero;
 	vector<CBala*> balas;
+	int max_monstruos;
+	vector<pair<int,int>> spawn_points;
+	pair<int,int> dameCasillaNormalJuntoAGenerador(int f,int c);
 
 public:
 	GameController(void);
@@ -21,8 +24,14 @@ public:
 	bool MoverJugador(Direccion dir);
 	bool JugadorEstaMoviendose();
 	void RecontruyeMapa();
-	void GeneraMonstruos(int cantidad);
+	void GeneraMonstruos();
 	void MueveEnemigos();
+	int Get_numBalas();
+	bool atraparonPersonaje();
+	int puntaje,tiempo,rate;
+
+
+
 
 };
 

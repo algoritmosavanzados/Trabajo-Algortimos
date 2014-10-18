@@ -35,20 +35,29 @@ void CTablero::Imprimete(System::Drawing::Graphics ^C,int ancho,int alto){
 				tablero[i].resize(c);
 				for(int j=0;j<tablero[i].size();j++){
 					System::Drawing::SolidBrush ^b;
+					//System::Drawing::Bitmap ^bmp;
 					switch(tablero[i][j]){
 					case PARED_EXTERIOR:
-						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::Black);	break;
+						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(173,112,55));	break;
+						//bmp=gcnew  System::Drawing::Bitmap("pared.png");		break;
 					case NORMAL:
-						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::DarkGray);	break;
+						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(184,189,85));	break;
+						//bmp=gcnew  System::Drawing::Bitmap("normal.png");		break;
 					case PARED:
-						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::Gray);	break;
+						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(191,135,75));	break;
+						//bmp=gcnew  System::Drawing::Bitmap("pared.png");		break;
 					case GENERADOR:
-						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::Peru);	break;
+						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(105,181,134));	break;
+						//bmp=gcnew  System::Drawing::Bitmap("pared.png");		break;
 					case RECORRIDO:
 						b= gcnew System::Drawing::SolidBrush(System::Drawing::Color::Yellow);	break;
+						//bmp=gcnew  System::Drawing::Bitmap("pared.png");		break;
 					}
 					C->FillRectangle(b,x,y,anchoBloque,altoBloque);
-					x+=anchoBloque;
+					//System::Drawing::Rectangle zonaMostrar= System::Drawing::Rectangle(x,y,anchoBloque,altoBloque);
+					//System::Drawing::Rectangle porcion= System::Drawing::Rectangle(0,0,60,60);
+					//C->DrawImage(bmp,zonaMostrar,porcion,System::Drawing::GraphicsUnit::Pixel);
+					x+=anchoBloque;	
 				}
 				y+=altoBloque;
 				x=0;
@@ -65,4 +74,16 @@ void CTablero::cambiarBloque(int f,int c,Casilla tipo){
 
 Casilla CTablero::getTipoCasilla(int f,int c){
 	return (Casilla) tablero[f][c];
+}
+
+
+vector<pair<int,int>> CTablero::getSpawnPoints(){
+	vector<pair<int,int>> resultado;
+	for(int i=0;i<tablero.size();i++){
+		for(int j=0;j<tablero[i].size();j++){
+			if(tablero[i][j]==GENERADOR)
+				resultado.push_back(make_pair(i,j));
+		}
+	}
+	return resultado;
 }

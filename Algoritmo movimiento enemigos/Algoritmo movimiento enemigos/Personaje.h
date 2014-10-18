@@ -43,6 +43,7 @@ public:
 	void Imprimete(System::Drawing::Graphics ^C,CTablero* tablero,int ancho,int alto);
 	stack<pair<int,int>> hallaMejorCamino(CTablero* tablero,int fObjetivo,int cObjetivo);
 	void avanza(CTablero* tablero,int fO,int cO);
+	bool colision(CJugador* jugador);
 };
 
 class CBala : public CPersonaje
@@ -52,6 +53,7 @@ private:
 public:
 	CBala(int f, int c, int ancho, int alto,Direccion direccion);
 	void Imprimete(System::Drawing::Graphics ^C, CTablero* tablero, int ancho, int alto);
-	bool muevete(CTablero* tablero, int ancho, int alto);
+	bool muevete(CTablero* tablero);
+	bool Colision(CEnemigo *enemigo);
 
 };

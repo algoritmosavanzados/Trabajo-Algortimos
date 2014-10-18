@@ -20,6 +20,6 @@ public:
 	bool esNormal(int f,int c);
 	Casilla getTipoCasilla(int f,int c);
 	void cambiarBloque(int f,int c,Casilla tipo);
-
+	vector<pair<int,int>> getSpawnPoints();
 };
 
