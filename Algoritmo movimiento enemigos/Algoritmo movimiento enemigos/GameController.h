@@ -7,12 +7,14 @@ class GameController
 {
 private:
 	CJugador* jugador;
+	CJugador* señuelo;
 	vector<CEnemigo*> enemigos;
 	CTablero* tablero;
 	vector<CBala*> balas;
 	int max_monstruos;
 	vector<pair<int,int>> spawn_points;
 	pair<int,int> dameCasillaNormalJuntoAGenerador(int f,int c);
+	CPowerUp *bonusAmmo;
 
 public:
 	GameController(void);
@@ -29,8 +31,8 @@ public:
 	int Get_numBalas();
 	bool atraparonPersonaje();
 	int puntaje,tiempo,rate;
-
-
+	void masAmmo();
+	bool atrapoAmmo();
 
 
 };

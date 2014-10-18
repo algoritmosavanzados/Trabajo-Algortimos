@@ -7,18 +7,19 @@ GameController::GameController(void)
 {
 	tablero=new CTablero();
 	jugador=new CJugador(7,11);
+	señuelo=NULL;
 	puntaje = 0;
 	tiempo=10;
 	rate=5;
-	enemigos.push_back(new CEnemigo(11,3));
+	/*enemigos.push_back(new CEnemigo(11,3));
 	enemigos.push_back(new CEnemigo(1,13));
 	enemigos.push_back(new CEnemigo(3,8));
-	enemigos.push_back(new CEnemigo(11,11));
+	enemigos.push_back(new CEnemigo(11,11));*/
 
 	spawn_points=tablero->getSpawnPoints();
 	max_monstruos=10;
 	srand((unsigned) time(NULL));
-
+	bonusAmmo=NULL;
 	HallarCaminos();
 
 	//RecontruyeMapa();
@@ -48,6 +49,10 @@ void GameController::ImprimeJuego(System::Drawing::Graphics ^C,int ancho,int alt
 	}
 	for (int i = 0; i < enemigos.size(); i++)
 		enemigos[i]->Imprimete(C, tablero, ancho, alto);
+
+
+	if(bonusAmmo!=NULL)
+		bonusAmmo->Imprimete(C,tablero,ancho,alto);
 	
 }
 
@@ -136,6 +141,21 @@ pair<int,int> GameController::dameCasillaNormalJuntoAGenerador(int f,int c){
 }
 
 
+bool GameController::atrapoAmmo(){
+	if(bonusAmmo!=NULL){{
+		if( bonusAmmo->colision(jugador)){
+			//-----AGREGAR BALAS
+
+			delete bonusAmmo;
+			bonusAmmo=NULL;
+			return true;
+		}
+	}
+	}else
+		return false;
+
+}
+
 bool GameController::JugadorEstaMoviendose(){
 	if(jugador!=NULL)
 		return jugador->moviendose;
@@ -157,4 +177,17 @@ bool GameController::atraparonPersonaje(){
 		}
 	}
 	return cond;
+}
+
+
+void GameController::masAmmo(){
+	int prob=rand()%1000;
+	if(prob<=5){
+		int f=-0,c=0;
+		while(tablero->getTipoCasilla(f,c)!=NORMAL){
+			f=rand()%tablero->f;	c=rand()%tablero->c;
+		}
+		bonusAmmo=new CPowerUp(f,c);GameController;
+
+	}
 }

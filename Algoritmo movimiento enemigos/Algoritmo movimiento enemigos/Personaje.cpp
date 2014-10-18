@@ -33,6 +33,9 @@ void Muevete(){
 }
 
 bool CJugador::MueveteHacia(Direccion dir,CTablero* tablero){
+	if(this==NULL)	return false;
+
+
 	if(this->dir!=dir){
 		this->dir=dir;
 		switch(dir){
@@ -411,4 +414,34 @@ bool CBala::Colision(CEnemigo *enemigo){
 	}
 	return false;
 }
-//-----
+//------------------------------------
+
+CPowerUp::CPowerUp(int f,int c) : CPersonaje(f,c){
+	
+}
+
+void CPowerUp::Imprimete(System::Drawing::Graphics ^C, CTablero* tablero, int ancho, int alto){
+	
+	int anchoElipse = ancho / tablero->c;
+	int altoElipse = alto / tablero->f;
+	int y = f * (alto / tablero->f);
+	int x = (ancho / tablero->c) * c;
+
+
+	System::Drawing::Rectangle porcion=System::Drawing::Rectangle(0,0,128,128);
+	System::Drawing::Bitmap ^bmp=gcnew System::Drawing::Bitmap("balas.png");
+
+	System::Drawing::Rectangle zonaMostrar= System::Drawing::Rectangle(x,y,anchoElipse,altoElipse);
+	C->DrawImage(bmp,zonaMostrar,porcion,System::Drawing::GraphicsUnit::Pixel);
+}
+
+
+bool CPowerUp::colision(CJugador* jugador){
+	
+	if ((jugador->f == f) && (jugador->c == c)){
+		f = -1; c == -1;
+		return true;
+	}
+	return false;
+}
+

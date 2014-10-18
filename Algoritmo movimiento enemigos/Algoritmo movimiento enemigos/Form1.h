@@ -350,6 +350,10 @@ namespace Algoritmomovimientoenemigos {
 				 ImprimeJuego();
 
 				 controlador->MueveEnemigos();
+				 controlador->masAmmo();
+				 
+
+				 controlador->atrapoAmmo();
 
 				 
 
@@ -405,7 +409,7 @@ private: System::Void Form1_KeyPress(System::Object^  sender, System::Windows::F
 					controlador->MoverJugador(ARRIBA);
 				}else if(c == 's' || c == 'S'){
 					controlador->MoverJugador(ABAJO);
-				}else if(c == 'v'){
+				}else if(c == 'v' || c == 'V'){
 					controlador->Añade_bala(panel1->Width, panel1->Height, max_num_balas); // este 20 es el maximo numero de balas q puedo disparar 
 				}
 			}

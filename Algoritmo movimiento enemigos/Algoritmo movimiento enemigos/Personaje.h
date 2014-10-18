@@ -57,3 +57,21 @@ public:
 	bool Colision(CEnemigo *enemigo);
 
 };
+
+class CPowerUp : public CPersonaje
+{
+public:
+	CPowerUp(int f,int c);
+	bool colision(CJugador* jugador);
+	void Imprimete(System::Drawing::Graphics ^C, CTablero* tablero, int ancho, int alto);
+	bool atrapoAmmo();
+};
+
+class CClon : public CPersonaje
+{
+public:
+	CClon(int f,int c);
+	bool colision(CJugador* jugador);
+	void Imprimete(System::Drawing::Graphics ^C, CTablero* tablero, int ancho, int alto);
+	bool atrapoClon();
+};
